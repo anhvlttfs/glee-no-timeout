@@ -21,8 +21,7 @@ EXPIRY_DAY=$(date -d "+$ACTIVE_INSTANCE_YEAR years" +%F)
 
 # Your trial license file and key files (You must change this!)
 TRIAL_LICENSE_FILE=".gitlab-license"
-PUBLIC_KEY_FILE="res/public.pem"
-PRIVATE_KEY_FILE="res/private.pem"
+LICENSE_ENCRYPTION_KEY_FILE="res/license.pem"
 
 # Encryption/Decryption paths (You should not change this)
 DEFAULT_LICENSE_PATH="."
@@ -51,13 +50,8 @@ if [ ! -f "$TRIAL_LICENSE_FILE" ]; then
     exit 1
 fi
 
-if [ ! -f "$PUBLIC_KEY_FILE" ]; then
+if [ ! -f "$LICENSE_ENCRYPTION_KEY_FILE" ]; then
     echo "Public key file not found!"
-    exit 1
-fi
-
-if [ ! -f "$PRIVATE_KEY_FILE" ]; then
-    echo "Private key file not found!"
     exit 1
 fi
 
@@ -103,7 +97,7 @@ base64 -d $DEFAULT_DECRYTION_PATH/license_encrypted.data > $DEFAULT_DECRYTION_PA
 base64 -d $DEFAULT_DECRYTION_PATH/license_encrypted.iv > $DEFAULT_DECRYTION_PATH/license_encrypted_iv.bin
 
 $OPENSSL_BIN rsautl -verify \
-    -inkey "$PUBLIC_KEY_FILE" \
+    -inkey "$LICENSE_ENCRYPTION_KEY_FILE" \
     -pubin -in $DEFAULT_DECRYTION_PATH/license_encrypted_key.bin \
     -out $DEFAULT_DECRYTION_PATH/aes.key
 
@@ -177,7 +171,7 @@ tr -d '\n' < "$DEFAULT_ENCRYPTION_PATH/aes.hex" | xxd -r -p > "$DEFAULT_ENCRYPTI
 tr -d '\n' < "$DEFAULT_ENCRYPTION_PATH/iv.hex"  | xxd -r -p > "$DEFAULT_ENCRYPTION_PATH/license_encrypted_iv.bin"
 
 $OPENSSL_BIN rsautl -encrypt \
-    -inkey "$PUBLIC_KEY_FILE" \
+    -inkey "$LICENSE_ENCRYPTION_KEY_FILE" \
     -pubin \
     -in "$DEFAULT_ENCRYPTION_PATH/aes.key" \
     -out "$DEFAULT_ENCRYPTION_PATH/license_encrypted_key.bin"
@@ -207,9 +201,9 @@ done
 # Cleanup and Notify user
 rm -rf $DEFAULT_DECRYTION_PATH $DEFAULT_ENCRYPTION_PATH || true;
 
-echo -e -n "Generated successfully new license file: \n"
+echo -e -n "Generated successfully new license file:"
 cat "$OUTPUT_ENCRYPTED_LICENSE_FILE"
 
 echo -e -n "\nNote: You may need to replace /opt/gitlab/embedded/service/gitlab-rails/.license_encryption_key.pub with this public key content:\n" 
-cat "$PUBLIC_KEY_FILE"
+cat "$LICENSE_ENCRYPTION_KEY_FILE"
 echo -e -n "\n"
