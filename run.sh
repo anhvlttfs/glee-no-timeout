@@ -21,7 +21,7 @@ ACTIVE_INSTANCE_YEAR=100
 EXPIRY_DAY=$(date -d "+$ACTIVE_INSTANCE_YEAR years" +%F)
 
 # Your trial license file and key files (You must change this!)
-LICENSE_ENCRYPTION_KEY_FILE="res/license.pem"
+LICENSE_ENCRYPTION_KEY_FILE="license.pem"
 
 # Encryption/Decryption paths (You should not change this)
 DEFAULT_LICENSE_PATH="."
@@ -67,8 +67,11 @@ if [[ $OPENSSL_BIN == "" || $JQ_BIN == "" || $XXD_BIN == "" ]]; then
 fi
 #####################################
 # Read user input for License File
-echo "Please enter the trial license you get from GitLab.com (Single line only):"
-read TRIAL_LICENSE
+echo "Please enter the trial license you get from GitLab.com (Ctrl+D to finish):"
+TRIAL_LICENSE=""
+while IFS= read -r line; do
+    TRIAL_LICENSE="$TRIAL_LICENSE$line"
+done
 
 #####################################
 # Prepare environment
@@ -187,8 +190,7 @@ tr -d '\n' < "$DEFAULT_ENCRYPTION_PATH/iv.hex"  | $XXD_BIN -r -p > "$DEFAULT_ENC
 
 $OPENSSL_BIN rsautl -encrypt \
     -inkey "$LICENSE_ENCRYPTION_KEY_FILE" \
-    -pubin \
-    -in "$DEFAULT_ENCRYPTION_PATH/aes.key" \
+    -pubin -in "$DEFAULT_ENCRYPTION_PATH/aes.key" \
     -out "$DEFAULT_ENCRYPTION_PATH/license_encrypted_key.bin"
 
 cp "$DEFAULT_DECRYTION_PATH/license_encrypted_key.bin" "$DEFAULT_ENCRYPTION_PATH/license_encrypted_key.bin"
@@ -204,10 +206,9 @@ $JQ_BIN -n \
     --arg iv "$(tr -d '\n' < "$DEFAULT_DECRYTION_PATH/license_encrypted.iv")" \
     '{key: $key, data: $data, iv: $iv}' > "$DEFAULT_ENCRYPTION_PATH/$OUTPUT_ENCRYPTED_LICENSE_FILE".json
 
-cat "$DEFAULT_ENCRYPTION_PATH/$OUTPUT_ENCRYPTED_LICENSE_FILE".json | base64 -w0 > "$OUTPUT_ENCRYPTED_LICENSE_FILE"
+cat "$DEFAULT_ENCRYPTION_PATH/$OUTPUT_ENCRYPTED_LICENSE_FILE".json | base64 -w0 > "$DEFAULT_DECRYTION_PATH/$OUTPUT_ENCRYPTED_LICENSE_FILE"
 
-GITLAB_KEY=$(cat "$OUTPUT_ENCRYPTED_LICENSE_FILE")
-echo "" > "$OUTPUT_ENCRYPTED_LICENSE_FILE"
+GITLAB_KEY=$(cat "$DEFAULT_DECRYTION_PATH/$OUTPUT_ENCRYPTED_LICENSE_FILE")
 for (( i=0; i<${#GITLAB_KEY}; i+=60 )); do
     echo -e -n "${GITLAB_KEY:i:60}\n" >> "$DEFAULT_OUTPUT_PATH/$OUTPUT_ENCRYPTED_LICENSE_FILE"
 done
