@@ -7,6 +7,7 @@ set -euo pipefail
 OPENSSL_BIN=$(which openssl)
 JQ_BIN=$(which jq)
 XXD_BIN=$(which xxd)
+CURL_BIN=$(which curl)
 
 # Get current date (You should not change this)
 CURR_DATE=$(date +%F)
@@ -21,16 +22,20 @@ ACTIVE_INSTANCE_YEAR=100
 EXPIRY_DAY=$(date -d "+$ACTIVE_INSTANCE_YEAR years" +%F)
 
 # Your trial license file and key files (You must change this!)
-LICENSE_ENCRYPTION_KEY_FILE="license.pem"
+LICENSE_ENCRYPTION_KEY_FILE="gitlab.pem"
 
 # Encryption/Decryption paths (You should not change this)
 DEFAULT_LICENSE_PATH="."
 DEFAULT_DECRYTION_PATH="lic_decrypted"
 DEFAULT_ENCRYPTION_PATH="lic_encrypted"
+DEFAULT_INPUT_PATH="input"
 DEFAULT_OUTPUT_PATH="output"
 
 # Check if still keep the branding info from trial license
 KEEP_TRIAL_BRANDING_INFO=false
+
+# Input license file name (You can change this)
+INPUT_LICENSE_FILE="old.gitlab-license"
 
 # Output license file name (You can change this)
 OUTPUT_JSON_LICENSE_FILE="gitlab-license.json"
@@ -65,13 +70,19 @@ if [[ $OPENSSL_BIN == "" || $JQ_BIN == "" || $XXD_BIN == "" ]]; then
     echo "Required binary not found."
     exit 1
 fi
+
+if [ ! -f "$DEFAULT_INPUT_PATH/$INPUT_LICENSE_FILE" ]; then
+    echo "Input license file not found!"
+    exit 1
+fi
 #####################################
 # Read user input for License File
-echo "Please enter the trial license you get from GitLab.com (Ctrl+D to finish):"
 TRIAL_LICENSE=""
-while IFS= read -r line; do
+for line in $(cat "$DEFAULT_INPUT_PATH/$INPUT_LICENSE_FILE"); do
     TRIAL_LICENSE="$TRIAL_LICENSE$line"
 done
+
+echo "Old license file: $TRIAL_LICENSE"
 
 #####################################
 # Prepare environment
