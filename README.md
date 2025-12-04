@@ -2,7 +2,7 @@
 
 GitLab EE Trial Removal &amp; Auto-upgrade
 
-> Tested on GitLab EE 18.5.1
+> Tested on GitLab EE 18.6
 
 ## How to run
 
@@ -12,14 +12,10 @@ This generator only works with Linux (prefer Ubuntu LTS)
 
 Furthermore, these following packages should be installed
 
-```bash
-bash
-jq
-openssl
-xxd
-```
-
-Also, you may need to access [GitLab Self-managed Instance trial](https://about.gitlab.com/free-trial/?hosted=self-managed) to obtain the trial key.
+- `bash`
+- `jq`
+- `openssl`
+- `xxd`
 
 ### Using current instance
 
@@ -27,16 +23,12 @@ Also, you may need to access [GitLab Self-managed Instance trial](https://about.
 chmod +x ./run.sh && ./run.sh
 ```
 
-Once the diaglog appear, paste your activation token you obtained from GitLab.com (can be in email, please check spam folder too).
-
 ### Using `docker` compose
 
 ```bash
 docker build -t glee:latest .
 docker run --rm -it glee:latest /app/run.sh
 ```
-
-Once the diaglog appear, paste your activation token you obtained from GitLab.com (can be in email, please check spam folder too).
 
 ### Apply the license
 
