@@ -8,7 +8,6 @@ trap 'echo "Error occurred at line ${LINENO} of ${BASH_SOURCE[0]}. Exiting..."; 
 OPENSSL_BIN=$(which openssl)
 JQ_BIN=$(which jq)
 XXD_BIN=$(which xxd)
-CURL_BIN=$(which curl)
 
 # Get current date (You should not change this)
 CURR_DATE=$(date +%F)
