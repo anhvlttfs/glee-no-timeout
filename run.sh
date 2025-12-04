@@ -82,8 +82,6 @@ for line in $(cat "$DEFAULT_INPUT_PATH/$INPUT_LICENSE_FILE"); do
     TRIAL_LICENSE="$TRIAL_LICENSE$line"
 done
 
-echo "Old license file: $TRIAL_LICENSE"
-
 #####################################
 # Prepare environment
 if [ -f .gitignore ]; then
