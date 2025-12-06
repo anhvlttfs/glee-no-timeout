@@ -1,0 +1,29 @@
+name: Generate new GitLab EE license
+permissions:
+  contents: read
+
+on:
+  push: 
+    branches: ["master"]
+  schedule:
+    - cron: "0 0 * * 1"
+
+jobs:
+  generate-new-license:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v4
+
+      - name: Install required packages
+        run: |
+          apt update && apt install -y jq openssl xxd
+
+      - name: Run the script
+        run: |
+          chmod +x ./run.sh && bash ./run.sh
+
+      - name: Upload the artifacts
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          path: output
