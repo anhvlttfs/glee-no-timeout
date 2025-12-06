@@ -18,7 +18,7 @@ NEW_USER_EMAIL="support@gitlab.com"
 NEW_USER_COMPANY="GitLab Inc."
 
 # Active instance year (You can change this)
-ACTIVE_INSTANCE_YEAR=100
+ACTIVE_INSTANCE_YEAR=25
 EXPIRY_DAY=$(date -d "+$ACTIVE_INSTANCE_YEAR years" +%F)
 
 # Your trial license file and key files (You must change this!)
@@ -42,7 +42,7 @@ OUTPUT_JSON_LICENSE_FILE="gitlab-license.json"
 OUTPUT_ENCRYPTED_LICENSE_FILE="new.gitlab-license"
 
 # User limit
-USER_LIMIT=2147483647
+USER_LIMIT=2500
 
 # GitLab Plan (either 'starter', 'premium' or 'ultimate') (You can change this)
 GITLAB_PLAN="ultimate"
